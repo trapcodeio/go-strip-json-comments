@@ -1,7 +1,6 @@
 package strip_json_comments
 
 import (
-	"fmt"
 	"regexp"
 )
 
@@ -47,10 +46,7 @@ func isEscaped(jsonString string, quotePosition int) bool {
 	return backslashCount%2 == 1
 }
 
-func StripJsonComments(jsonString string) string {
-	return StripJsonCommentsWithOptions(jsonString, nil)
-}
-
+// StripJsonCommentsWithOptions - strips comments from JSON string with options
 func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 	if options == nil {
 		options = &Options{Whitespace: true, TrailingCommas: false}
@@ -140,7 +136,6 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 				}
 			} else if currentCharacter == "," {
 				// Flush buffer prior to this point, and save new comma index
-				fmt.Println("Flush buffer prior to this point, and save new comma index")
 				result += buffer + jsonString[offset:index]
 				buffer = ""
 				offset = index
@@ -162,4 +157,9 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 	}
 
 	return result + buffer + end
+}
+
+// StripJsonComments - strips comments from JSON string
+func StripJsonComments(jsonString string) string {
+	return StripJsonCommentsWithOptions(jsonString, nil)
 }
