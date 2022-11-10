@@ -1,24 +1,10 @@
-package strip_json_comments
+package stripjsoncomments
 
 import "testing"
 
 // Package is an exact port of `Sindresorhus` strip-json-comments nodejs package.
 // Ported by `trapcodeio`
 // File test.js in repository: https://github.com/sindresorhus/strip-json-comments
-
-// testWithOptions is a shorthand function for testing with options
-func testWithOptions(json string, expected string, options *Options, t *testing.T) {
-	striped := StripJsonCommentsWithOptions(json, options)
-
-	if striped != expected {
-		t.Errorf("Expected %v of lenght %v \n | Got %v of lenght %v", striped, len(striped), expected, len(expected))
-	}
-}
-
-// test is a shorthand function for testing
-func test(json string, expected string, t *testing.T) {
-	testWithOptions(json, expected, nil, t)
-}
 
 func Test_Replace_Comments_With_WhiteSpace(t *testing.T) {
 	test("//comment\n{\"a\":\"b\"}", "         \n{\"a\":\"b\"}", t)
@@ -58,18 +44,15 @@ func Test_Line_Endings_No_Comments(t *testing.T) {
 func Test_Line_Endings_With_Single_Line_Comment(t *testing.T) {
 
 	test("{\"a\":\"b\"//c\n}", "{\"a\":\"b\"   \n}", t)
-	//test("{\"a\":\"b\"//c\r\n}", "{\"a\":\"b\"   \r\n}", t)
-
+	test("{\"a\":\"b\"//c\r\n}", "{\"a\":\"b\"   \r\n}", t)
 }
 
 func Test_Line_Endings_With_Line_Block_Comment(t *testing.T) {
-
 	test("{\"a\":\"b\"/*c*/\n}", "{\"a\":\"b\"     \n}", t)
 	test("{\"a\":\"b\"/*c*/\r\n}", "{\"a\":\"b\"     \r\n}", t)
 }
 
 func Test_Line_Endings_With_Multi_Line_Block_Comment(t *testing.T) {
-
 	test("{\"a\":\"b\",/*c\nc2*/\"x\":\"y\"\n}", "{\"a\":\"b\",   \n    \"x\":\"y\"\n}", t)
 	test("{\"a\":\"b\",/*c\r\nc2*/\"x\":\"y\"\r\n}", "{\"a\":\"b\",   \r\n    \"x\":\"y\"\r\n}", t)
 }
@@ -86,18 +69,47 @@ func Test_Handles_Wierd_Escaping(t *testing.T) {
 }
 
 func Test_Strips_Trailing_Commas(t *testing.T) {
-	// js version
-	// t.is(stripJsonComments('{"x":true,}', {trailingCommas: true}), '{"x":true }');
-	//	t.is(stripJsonComments('{"x":true,}', {trailingCommas: true, whitespace: false}), '{"x":true}');
-	//	t.is(stripJsonComments('{"x":true,\n  }', {trailingCommas: true}), '{"x":true \n  }');
-	//	t.is(stripJsonComments('[true, false,]', {trailingCommas: true}), '[true, false ]');
-	//	t.is(stripJsonComments('[true, false,]', {trailingCommas: true, whitespace: false}), '[true, false]');
-	//	t.is(stripJsonComments('{\n  "array": [\n    true,\n    false,\n  ],\n}', {trailingCommas: true, whitespace: false}), '{\n  "array": [\n    true,\n    false\n  ]\n}');
-	//	t.is(stripJsonComments('{\n  "array": [\n    true,\n    false /* comment */ ,\n /*comment*/ ],\n}', {trailingCommas: true, whitespace: false}), '{\n  "array": [\n    true,\n    false  \n  ]\n}');
-
-	// go version
-	//testWithOptions(`{"x":true,}`, `{"x":true }`, &Options{true, true}, t)
-	//testWithOptions(`{"x":true,}`, `{"x":true}`, &Options{false, true}, t)
+	testWithOptions(`{"x":true,}`, `{"x":true }`, &Options{true, true}, t)
+	testWithOptions(`{"x":true,}`, `{"x":true}`, &Options{false, true}, t)
 	testWithOptions("{\"x\":true,\n  }", "{\"x\":true \n  }", &Options{true, true}, t)
-	//testWithOptions("[true, false,]", "[true, false ]", &Options{true, true}, t)
+	testWithOptions("[true, false,]", "[true, false ]", &Options{true, true}, t)
+	testWithOptions("[true, false,]", "[true, false]", &Options{false, true}, t)
+	testWithOptions("{\n  \"array\": [\n    true,\n    false,\n  ],\n}", "{\n  \"array\": [\n    true,\n    false\n  ]\n}", &Options{false, true}, t)
+	testWithOptions("{\n  \"array\": [\n    true,\n    false /* comment */ ,\n /*comment*/ ],\n}", "{\n  \"array\": [\n    true,\n    false  \n  ]\n}", &Options{false, true}, t)
+}
+
+func Test_Handles_Malformed_Block_Comments(t *testing.T) {
+	// pass
+	test("[] */", "[] */", t)
+	// fail
+	testShouldFail("[] /*", "[] /*", t)
+}
+
+// ============================================================================
+// ============================================================================
+// ===== Test Helper Functions ================================================
+// ============================================================================
+// ============================================================================
+
+// testWithOptions is a shorthand function for testing with options
+func testWithOptions(json string, expected string, options *Options, t *testing.T) {
+	result := StripWithOptions(json, options)
+
+	if result != expected {
+		t.Errorf("Expected %v of lenght %v \n | Got %v of lenght %v", result, len(result), expected, len(expected))
+	}
+}
+
+// test is a shorthand function for testing
+func test(json string, expected string, t *testing.T) {
+	testWithOptions(json, expected, nil, t)
+}
+
+// testShouldFail - test that should fail
+func testShouldFail(json string, expected string, t *testing.T) {
+	result := Strip(json)
+
+	if result == expected {
+		t.Errorf("Expected %v of lenght %v \n | Got %v of lenght %v", result, len(result), expected, len(expected))
+	}
 }

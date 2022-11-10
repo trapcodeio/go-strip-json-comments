@@ -1,7 +1,6 @@
-package strip_json_comments
+package stripjsoncomments
 
 import (
-	"fmt"
 	"regexp"
 )
 
@@ -25,6 +24,7 @@ func stripWithoutWhitespace() string {
 }
 
 func stripWithWhitespace(string string, start *int, end *int) string {
+	// slice only if start and end are not nil
 	if start != nil && end != nil {
 		string = string[*start:*end]
 	} else if start != nil {
@@ -46,13 +46,15 @@ func isEscaped(jsonString string, quotePosition int) bool {
 	return backslashCount%2 == 1
 }
 
-// StripJsonCommentsWithOptions - strips comments from JSON string with options
-func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
+// StripWithOptions - strips comments from JSON string with options
+func StripWithOptions(jsonString string, options *Options) string {
+
+	// if options are not provided, use default options
+	// whitespace: true
+	// trailingCommas: false
 	if options == nil {
 		options = &Options{Whitespace: true, TrailingCommas: false}
 	}
-
-	fmt.Println("options", options)
 
 	isInsideString := false
 	isInsideComment := notInsideComment
@@ -61,6 +63,7 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 	result := ""
 	commaIndex := -1
 
+	// shorthand function
 	strip := func(index int) string {
 		if options.Whitespace {
 			return stripWithWhitespace(jsonString, &offset, &index)
@@ -98,10 +101,9 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 		} else if isInsideComment == singleComment && currentCharacter+nextCharacter == "\r\n" {
 			// Exit single-line comment via \r\n
 			index++
-			isInsideComment = singleComment
+			isInsideComment = notInsideComment
 			buffer += strip(index)
 			offset = index
-			continue
 		} else if isInsideComment == singleComment && currentCharacter == "\n" {
 			// Exit single-line comment via \n
 			isInsideComment = notInsideComment
@@ -113,19 +115,18 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 			offset = index
 			isInsideComment = multiComment
 			index++
-			continue
+
 		} else if isInsideComment == multiComment && currentCharacter+nextCharacter == "*/" {
 			// Exit multiline comment
 			index++
 			isInsideComment = notInsideComment
 			buffer += strip(index + 1)
 			offset = index + 1
-			continue
+
 		} else if options.TrailingCommas && isInsideComment == notInsideComment {
 			if commaIndex != -1 {
 				if currentCharacter == "}" || currentCharacter == "]" {
 					// Strip trailing comma
-					fmt.Println("== strip trailing comma ==")
 					buffer += jsonString[offset:index]
 					if options.Whitespace {
 						s, e := 0, 1
@@ -133,6 +134,7 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 					} else {
 						result += stripWithoutWhitespace()
 					}
+					result += buffer[1:]
 					buffer = ""
 					offset = index
 					commaIndex = -1
@@ -144,7 +146,6 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 				}
 			} else if currentCharacter == "," {
 				// Flush buffer prior to this point, and save new comma index
-				fmt.Println("== flush buffer prior to this point, and save new comma index ==")
 				result += buffer + jsonString[offset:index]
 				buffer = ""
 				offset = index
@@ -169,7 +170,7 @@ func StripJsonCommentsWithOptions(jsonString string, options *Options) string {
 	return result + buffer + end
 }
 
-// StripJsonComments - strips comments from JSON string
-func StripJsonComments(jsonString string) string {
-	return StripJsonCommentsWithOptions(jsonString, nil)
+// Strip - strips comments from JSON string
+func Strip(jsonString string) string {
+	return StripWithOptions(jsonString, nil)
 }
