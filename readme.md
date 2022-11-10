@@ -1,9 +1,12 @@
 # go-strip-json-comments
 
+[github](https://github.com/trapcodeio/go-strip-json-comments) | [pkg.go.dev](https://pkg.go.dev/github.com/trapcodeio/go-strip-json-comments)
+
 #### Note:
 
-This is an exact port of Sindresorhus [strip-json-comments](http://githib.com/sindresorhus/strip-json-comments) to
+This is an exact port of Sindresorhus Nodejs [strip-json-comments](http://githib.com/sindresorhus/strip-json-comments) to
 GoLang.
+
 
 
 > Strip comments from JSON. Lets you use comments in your JSON files!
@@ -90,6 +93,3 @@ BenchmarkWithFiles/strip_Big_JSON_comments-16                                  8
 PASS
 ok      github.com/trapcodeio/go-strip-json-comments    24.843s
 ```
-
-
-## API
