@@ -50,15 +50,45 @@ func main() {
 
 	fmt.Println(stripjsoncomments.Strip(json))
 	//=>{ "unicorn": "cake" }
-	
+
 	// with options
 	options := stripjsoncomments.Options{
-        Whitespace: false,
+		Whitespace:     false,
 		TrailingCommas: true,
-    }
-	
+	}
+
 	fmt.Println(stripjsoncomments.StripWithOptions(json, &options))
 }
+```
+
+### Benchmark
+
+```sh
+go test -bench=. -count 5 -run=^#
+```
+
+```
+goos: darwin
+goarch: amd64
+pkg: github.com/trapcodeio/go-strip-json-comments
+cpu: Intel(R) Core(TM) i9-9980HK CPU @ 2.40GHz
+BenchmarkWithFiles/strip_JSON_comments-16                    332           3304452 ns/op
+BenchmarkWithFiles/strip_JSON_comments-16                    408           3759578 ns/op
+BenchmarkWithFiles/strip_JSON_comments-16                    289           3634032 ns/op
+BenchmarkWithFiles/strip_JSON_comments-16                    297           3826366 ns/op
+BenchmarkWithFiles/strip_JSON_comments-16                    338           3652408 ns/op
+BenchmarkWithFiles/strip_JSON_comments_without_whitespace-16                 621           1747448 ns/op
+BenchmarkWithFiles/strip_JSON_comments_without_whitespace-16                 639           1899337 ns/op
+BenchmarkWithFiles/strip_JSON_comments_without_whitespace-16                 652           1891341 ns/op
+BenchmarkWithFiles/strip_JSON_comments_without_whitespace-16                 766           1799857 ns/op
+BenchmarkWithFiles/strip_JSON_comments_without_whitespace-16                 699           1867128 ns/op
+BenchmarkWithFiles/strip_Big_JSON_comments-16                                  9         131861237 ns/op
+BenchmarkWithFiles/strip_Big_JSON_comments-16                                  8         138128030 ns/op
+BenchmarkWithFiles/strip_Big_JSON_comments-16                                  9         140734501 ns/op
+BenchmarkWithFiles/strip_Big_JSON_comments-16                                  8         126000649 ns/op
+BenchmarkWithFiles/strip_Big_JSON_comments-16                                  8         133652308 ns/op
+PASS
+ok      github.com/trapcodeio/go-strip-json-comments    24.843s
 ```
 
 
