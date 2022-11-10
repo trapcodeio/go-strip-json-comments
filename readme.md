@@ -64,6 +64,13 @@ func main() {
 }
 ```
 
+### Test
+Clone repo and run
+```sh
+go test -v
+```
+you can also view them in this repo actions tab.
+
 ### Benchmark
 
 ```sh
@@ -93,3 +100,4 @@ BenchmarkWithFiles/strip_Big_JSON_comments-16                                  8
 PASS
 ok      github.com/trapcodeio/go-strip-json-comments    24.843s
 ```
+
