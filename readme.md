@@ -4,7 +4,7 @@
 
 #### Note:
 
-This is an exact port of Sindresorhus Nodejs [strip-json-comments](http://githib.com/sindresorhus/strip-json-comments) to
+This is an exact port of Sindresorhus Nodejs [strip-json-comments](https://github.com/sindresorhus/strip-json-comments) to
 GoLang.
 
 
